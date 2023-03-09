@@ -1,9 +1,32 @@
 version: '3.8'
 
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
 services:
   ### RabbitMQ #############################################
   rabbitmq:
-    build: ./rabbitmq
+    build: 
+      context: ./rabbitmq
     ports:
-      - "{RABBITMQ_NODE_HOST_PORT}:5672"
-      - "{RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672"
+      - "${RABBITMQ_NODE_HOST_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672"
+    networks:
+      - backend
+
+  ### PostgreSQL ###########################################
+  postgres:
+    build:
+      context: ./postgres
+      args:
+        - POSTGRES_VERSION=${POSTGRES_VERSION}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
